@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz – Geografía Económica de Panamá</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F4F2EC; --surface: #FFFFFF; --surface2: #F8F7F2;
+    --navy: #1B2A4A; --navy-light: #E8EBF2;
+    --gold: #C9922A; --gold-light: #FAF0DC;
+    --teal: #1D9E75; --teal-light: #E1F5EE;
+    --green: #639922; --green-light: #EAF3DE; --green-dark: #27500A;
+    --red: #E24B4A; --red-light: #FCEBEB; --red-dark: #501313;
+    --gray-100: #D3D1C7; --gray-200: #B4B2A9;
+    --text: #1a1a18; --text-muted: #6b6b68;
+    --radius: 14px; --radius-sm: 8px;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem 4rem; }
+  .container { width: 100%; max-width: 680px; }
+  .site-header { text-align: center; margin-bottom: 2rem; padding-top: 1rem; }
+  .badge { display: inline-block; background: var(--gold-light); color: #7A4F0A; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 14px; border-radius: 999px; border: 1px solid #E8C577; margin-bottom: 12px; }
+  .site-header h1 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; line-height: 1.2; }
+  .site-header p { font-size: 14px; color: var(--text-muted); margin-top: 6px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  /* Start */
+  .start-card { background: var(--surface); border: 1px solid var(--gray-100); border-radius: var(--radius); padding: 3rem 2rem; text-align: center; }
+  .start-icon { font-size: 60px; margin-bottom: 1.25rem; display: block; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .start-card h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .start-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6; }
+  .stats-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .stat-pill { background: var(--surface2); border: 1px solid var(--gray-100); border-radius: 999px; padding: 6px 16px; font-size: 13px; color: var(--text-muted); }
+  .stat-pill strong { color: var(--text); }
+  .btn-start { display: inline-block; background: var(--navy); color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 40px; border-radius: 999px; border: none; cursor: pointer; transition: transform 0.15s, background 0.15s; letter-spacing: 0.02em; }
+  .btn-start:hover { background: #2a3e6a; transform: scale(1.03); }
+  /* Game */
+  .game-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .prog-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .score-chip { background: var(--surface); border: 1px solid var(--gray-100); border-radius: 999px; padding: 5px 14px; font-size: 13px; font-weight: 500; color: var(--text); }
+  .score-chip span { color: var(--navy); font-family: 'Syne', sans-serif; font-weight: 700; }
+  .progress-track { height: 6px; background: var(--gray-100); border-radius: 3px; margin-bottom: 1.25rem; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--navy), var(--gold)); border-radius: 3px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+  .question-card { background: var(--surface); border: 1px solid var(--gray-100); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  .q-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .q-num { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); font-family: 'Syne', sans-serif; }
+  .q-theme { font-size: 11px; color: var(--text-muted); background: var(--surface2); padding: 3px 10px; border-radius: 999px; }
+  .q-text { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; line-height: 1.5; color: var(--text); }
+  .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  @media (max-width: 480px) { .answers-grid { grid-template-columns: 1fr; } }
+  .answer-btn { display: flex; align-items: flex-start; gap: 10px; padding: 14px; background: var(--surface); border: 1px solid var(--gray-100); border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); text-align: left; line-height: 1.5; transition: border-color 0.15s, background 0.15s, transform 0.1s; }
+  .answer-btn:hover:not(:disabled) { border-color: var(--gray-200); background: var(--surface2); }
+  .answer-btn:active:not(:disabled) { transform: scale(0.98); }
+  .answer-btn:disabled { cursor: default; }
+  .ans-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: 'Syne', sans-serif; flex-shrink: 0; }
+  .icon-a { background: #CECBF6; color: #3C3489; }
+  .icon-b { background: #9FE1CB; color: #085041; }
+  .icon-c { background: #FAC775; color: #633806; }
+  .icon-d { background: #F5C4B3; color: #712B13; }
+  .answer-btn.correct { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+  .answer-btn.wrong { background: var(--red-light); border-color: var(--red); color: var(--red-dark); }
+  .answer-btn.reveal-correct { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+  .feedback { border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; line-height: 1.6; margin-bottom: 1rem; display: none; }
+  .feedback.correct { background: var(--green-light); border: 1px solid var(--green); color: var(--green-dark); }
+  .feedback.wrong { background: var(--red-light); border: 1px solid var(--red); color: var(--red-dark); }
+  .btn-next { width: 100%; padding: 13px; border-radius: var(--radius-sm); border: 1px solid var(--gray-100); background: var(--surface); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer; display: none; transition: background 0.15s; }
+  .btn-next:hover { background: var(--surface2); border-color: var(--gray-200); }
+  /* End */
+  .end-card { background: var(--surface); border: 1px solid var(--gray-100); border-radius: var(--radius); padding: 2.5rem 2rem; text-align: center; }
+  .trophy { font-size: 56px; display: block; margin-bottom: 1rem; }
+  .end-score-big { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+  .end-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .end-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--surface2); border-radius: var(--radius-sm); padding: 14px 10px; }
+  .stat-val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--text); }
+  .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .end-msg { font-size: 15px; color: var(--text); font-style: italic; margin-bottom: 1.75rem; }
+  .btn-restart { display: inline-block; background: var(--surface2); color: var(--text); border: 1px solid var(--gray-100); border-radius: 999px; padding: 12px 32px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+  .btn-restart:hover { background: var(--gray-100); }
+  .footer { text-align: center; margin-top: 2rem; font-size: 12px; color: var(--gray-200); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="site-header">
+    <div class="badge">💰 Módulo II</div>
+    <h1>Geografía Económica de Panamá</h1>
+    <p>Unidad I · Sectores Productivos y Posición Geográfica</p>
+  </header>
+
+  <div id="start-screen" class="screen active">
+    <div class="start-card">
+      <span class="start-icon">🌐</span>
+      <h2>¿Listo para el quiz?</h2>
+      <p>Pon a prueba tus conocimientos sobre los sectores económicos de Panamá, el Canal, el turismo, la logística y más.</p>
+      <div class="stats-row">
+        <div class="stat-pill"><strong>25</strong> preguntas</div>
+        <div class="stat-pill"><strong>100</strong> pts c/u</div>
+        <div class="stat-pill">Orden <strong>aleatorio</strong></div>
+      </div>
+      <button class="btn-start" onclick="startGame()">¡Comenzar! →</button>
+    </div>
+  </div>
+
+  <div id="game-screen" class="screen">
+    <div class="game-top">
+      <span class="prog-label" id="prog-text">Pregunta 1 de 25</span>
+      <div class="score-chip">⭐ <span id="score-display">0</span> pts</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="prog-bar" style="width:4%"></div></div>
+    <div class="question-card">
+      <div class="q-meta">
+        <span class="q-num" id="q-num">Pregunta 1</span>
+        <span class="q-theme" id="q-theme"></span>
+      </div>
+      <div class="q-text" id="q-text"></div>
+    </div>
+    <div class="answers-grid" id="answers"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="btn-next" id="next-btn" onclick="nextQuestion()">Siguiente →</button>
+  </div>
+
+  <div id="end-screen" class="screen">
+    <div class="end-card">
+      <span class="trophy" id="trophy">🏆</span>
+      <div class="end-score-big" id="end-score"></div>
+      <div class="end-sub" id="end-sub"></div>
+      <div class="end-stats">
+        <div class="stat-card"><div class="stat-val" id="s-correct"></div><div class="stat-lbl">Correctas</div></div>
+        <div class="stat-card"><div class="stat-val" id="s-wrong"></div><div class="stat-lbl">Incorrectas</div></div>
+        <div class="stat-card"><div class="stat-val" id="s-pct"></div><div class="stat-lbl">Porcentaje</div></div>
+      </div>
+      <div class="end-msg" id="end-msg"></div>
+      <button class="btn-restart" onclick="restartGame()">↩ Volver a jugar</button>
+    </div>
+  </div>
+
+  <div class="footer">Quiz · Geografía Económica de Panamá – Módulo II</div>
+</div>
+
+<script>
+const allQuestions = [
+  // Geografía económica general
+  { q: "¿A qué rama de la geografía pertenece la Geografía Económica?", opts: ["Geografía Física","Geografía Regional","Geografía Humana","Geografía Política"], ans: 2, exp: "La Geografía Económica es una rama de la Geografía Humana, ya que estudia las dinámicas de producción y consumo en los lugares geográficos donde tienen lugar.", tema: "Geo Económica" },
+  { q: "¿Qué estudia la Geografía Económica?", opts: ["Los accidentes geográficos del país","La relación entre dinámicas de producción y consumo y los lugares geográficos","Solo los recursos naturales de un territorio","El impacto del clima en la economía"], ans: 1, exp: "La Geografía Económica estudia la relación entre las dinámicas de producción y consumo propias de la economía y los lugares geográficos en los que estas tienen lugar.", tema: "Geo Económica" },
+
+  // Sectores del PIB
+  { q: "¿Qué porcentaje del PIB representan las actividades terciarias en Panamá?", opts: ["4.1%","16.7%","79.2%","60.5%"], ans: 2, exp: "Las actividades terciarias (servicios) representan el 79.2% del PIB panameño, siendo el sector dominante de la economía.", tema: "Sectores PIB" },
+  { q: "¿Qué porcentaje del PIB representan las actividades primarias en Panamá?", opts: ["4.1%","16.7%","25%","8%"], ans: 0, exp: "Las actividades primarias representan el 4.1% del PIB, aunque son vitales para la seguridad alimentaria y la economía rural.", tema: "Sectores PIB" },
+  { q: "¿Qué porcentaje del PIB representan las actividades secundarias en Panamá?", opts: ["4.1%","16.7%","79.2%","30%"], ans: 1, exp: "Las actividades secundarias (industria y manufactura) representan el 16.7% del PIB panameño.", tema: "Sectores PIB" },
+
+  // Sector Primario
+  { q: "¿Qué tipo de actividades abarca el sector primario en Panamá?", opts: ["Manufactura, construcción y minería","Servicios financieros, turismo y logística","Agricultura, ganadería, pesca, silvicultura y minería","Tecnología, software e investigación"], ans: 2, exp: "El sector primario abarca las actividades directamente relacionadas con la naturaleza: agricultura, ganadería, pesca, silvicultura y minería.", tema: "Sector Primario" },
+  { q: "¿Cuáles son las principales provincias productoras de ganadería en Panamá?", opts: ["Colón, Bocas del Toro, Darién y Panamá Oeste","Chiriquí, Panamá, Herrera y Veraguas","Coclé, Los Santos, Herrera y Colón","Darién, Panamá, Coclé y Chiriquí"], ans: 1, exp: "Las principales provincias productoras de ganadería (carne bovina, leche y porcinos) son Chiriquí, Panamá, Herrera y Veraguas.", tema: "Sector Primario" },
+  { q: "¿Qué porcentaje del PIB representa la pesca y acuicultura en Panamá?", opts: ["4.1%","2.5%","0.4%","1.8%"], ans: 2, exp: "La pesca y acuicultura representa cerca del 0.4% del PIB; exporta principalmente camarones, langostinos y diversas especies de pescado.", tema: "Sector Primario" },
+  { q: "¿Cuál es la principal actividad económica de la Región Occidental de Panamá?", opts: ["Minería y construcción","Turismo y pesca","Agricultura, especialmente banano y café","Servicios financieros y logística"], ans: 2, exp: "La Región Occidental (Chiriquí y zonas aledañas) basa su actividad económica en la agricultura, especialmente la producción de banano y café.", tema: "Regiones" },
+
+  // Sector Secundario
+  { q: "¿Qué incluye el sector secundario de la economía panameña?", opts: ["Comercio, turismo y banca","Todas las actividades de transformación de materias primas y recursos naturales","Solo la construcción de edificios","Logística y transporte marítimo"], ans: 1, exp: "El sector secundario incluye todas las actividades de transformación de materias primas y recursos naturales, como manufactura, construcción, energía y minería.", tema: "Sector Secundario" },
+  { q: "¿Qué caracteriza a la industria farmacéutica en Panamá?", opts: ["Produce el 50% de los medicamentos que consume","Producción local limitada que cubre solo el 6% de la demanda","Es la más avanzada de Centroamérica","Exporta el 80% de su producción"], ans: 1, exp: "La industria farmacéutica panameña tiene producción local limitada que apenas cubre el 6% de la demanda; la mayoría de medicamentos son importados.", tema: "Sector Secundario" },
+  { q: "¿En cuánto superan los precios de medicamentos en Panamá a los de países vecinos centroamericanos?", opts: ["10%","27%","50%","5%"], ans: 1, exp: "Los precios de los medicamentos en Panamá son un 27% más altos que en los países vecinos de Centroamérica.", tema: "Sector Secundario" },
+  { q: "¿Cuál de las siguientes actividades industriales tuvo el mayor crecimiento porcentual en la producción manufacturera?", opts: ["Carne y productos cárnicos (3.6%)","Porcino (8.9%)","Azúcar de caña (5.9%)","Productos de molinería (4.6%)"], ans: 1, exp: "La producción porcina registró el mayor crecimiento con un 8.9%, seguida por el azúcar de caña (5.9%) y las aves de corral (5.6%).", tema: "Sector Secundario" },
+
+  // Sector Terciario y Canal
+  { q: "¿Cuánto contribuye el Canal de Panamá al PIB panameño?", opts: ["Entre 1% y 2%","Entre 6.8% y 7.7%","Entre 15% y 20%","Entre 3% y 4%"], ans: 1, exp: "El Canal de Panamá contribuye entre el 6.8% y 7.7% al PIB panameño, además de generar empleos e ingresos para el gobierno.", tema: "Canal de Panamá" },
+  { q: "¿Qué porcentaje del comercio marítimo global facilita el Canal de Panamá?", opts: ["1%","3%","6%","15%"], ans: 2, exp: "El Canal de Panamá facilita más del 6% del comercio marítimo global, siendo una vía crucial para el transporte de mercancías entre regiones.", tema: "Canal de Panamá" },
+  { q: "¿A cuántos puertos del mundo se conecta el Canal de Panamá?", opts: ["500","1,920","3,000","750"], ans: 1, exp: "El Canal se conecta con 1,920 puertos del mundo y conecta 180 rutas marítimas, siendo utilizado por 170 países.", tema: "Canal de Panamá" },
+  { q: "¿Cuántas toneladas de emisiones de CO₂ ha ayudado a reducir el Canal desde 1914?", opts: ["100 millones","750 millones","500 millones","1,000 millones"], ans: 1, exp: "Desde 1914, la vía interoceánica ha ayudado a reducir 750 millones de toneladas de emisiones de CO₂ al ser la ruta más corta de transporte marítimo.", tema: "Canal de Panamá" },
+  { q: "¿Qué porcentaje del agua reutilizan las tinas innovadoras del Canal ampliado por esclusaje?", opts: ["30%","45%","60%","80%"], ans: 2, exp: "Las 18 tinas de reutilización de agua del Canal ampliado reutilizan el 60% del agua por esclusaje, usando 7% menos agua que las esclusas Panamax.", tema: "Canal de Panamá" },
+  { q: "¿Cuál es la velocidad máxima que deben mantener los buques en zonas delimitadas del Canal para proteger a las ballenas jorobadas?", opts: ["5 nudos","10 nudos","15 nudos","20 nudos"], ans: 1, exp: "Desde el 1 de agosto hasta el 30 de noviembre, los buques deben reducir su velocidad a un máximo de 10 nudos en zonas delimitadas para proteger a las ballenas jorobadas.", tema: "Canal de Panamá" },
+
+  // Zona Libre y Finanzas
+  { q: "¿Cuál es la zona franca más grande del hemisferio occidental?", opts: ["Panamá Pacífico","Colón Free Trade Zone (Zona Libre de Colón)","Ciudad del Saber","Zona Franca de David"], ans: 1, exp: "La Zona Libre de Colón es la zona franca más grande del hemisferio, facilitando el comercio internacional, la reexportación y el comercio al por menor.", tema: "Comercio" },
+
+  // Turismo
+  { q: "¿Cuánto alcanzó el ingreso turístico de Panamá en 2024?", opts: ["$500 millones","$750.5 millones","$1,023.1 millones","$2,000 millones"], ans: 2, exp: "El ingreso turístico de Panamá en 2024 alcanzó los $1,023.1 millones, con un porcentaje de ocupación hotelera de alrededor del 60.5%.", tema: "Turismo" },
+  { q: "¿Cuántos visitantes llegaron por cruceros a Panamá según los datos del documento?", opts: ["50,000","128,359","356,958","200,000"], ans: 1, exp: "Los cruceros registraron el ingreso de 128,359 personas, mientras que el Aeropuerto Internacional de Tocumen registró 356,958 visitantes.", tema: "Turismo" },
+
+  // Sector Cuaternario y Regiones
+  { q: "¿En qué se basa el sector cuaternario de la economía panameña?", opts: ["Extracción de recursos naturales","Manufactura y transformación industrial","El conocimiento y la economía intangible (tecnología, software, I+D)","Comercio al por menor"], ans: 2, exp: "El sector cuaternario está basado en el conocimiento y la economía intangible: telecomunicaciones avanzadas, software, investigación científica y desarrollo.", tema: "Sector Cuaternario" },
+  { q: "¿Cuáles son las escalas de análisis económico regional de Panamá según el documento?", opts: ["Norte, Sur, Este y Oeste","Occidente, Central, Metropolitana y Oriente","Capital, Interior, Costa e Islas","Pacífico, Atlántico, Montaña y Selva"], ans: 1, exp: "Las cuatro escalas de análisis económico regional de Panamá son: Occidente, Central, Metropolitana y Oriente.", tema: "Regiones" },
+  { q: "¿Qué actividades caracterizan principalmente a la Región Metropolitana de Panamá?", opts: ["Agricultura y pesca","Ganadería y silvicultura","Construcción, minería, transporte y comunicaciones","Turismo ecológico y agricultura"], ans: 2, exp: "La Región Metropolitana (Provincia de Panamá) se caracteriza por la construcción, la minería, el transporte y las comunicaciones.", tema: "Regiones" },
+];
+
+let questions = [], current = 0, score = 0, correct = 0, answered = false;
+const icons = ['A','B','C','D'];
+const iconClasses = ['icon-a','icon-b','icon-c','icon-d'];
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+function startGame() {
+  questions = shuffle(allQuestions);
+  current = 0; score = 0; correct = 0; answered = false;
+  show('game-screen'); renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[current];
+  document.getElementById('prog-text').textContent = `Pregunta ${current+1} de ${questions.length}`;
+  document.getElementById('score-display').textContent = score;
+  document.getElementById('prog-bar').style.width = `${Math.round(((current+1)/questions.length)*100)}%`;
+  document.getElementById('q-num').textContent = `Pregunta ${current+1}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-theme').textContent = q.tema;
+  const grid = document.getElementById('answers');
+  grid.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.innerHTML = `<span class="ans-icon ${iconClasses[i]}">${icons[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    grid.appendChild(btn);
+  });
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'none'; fb.className = 'feedback';
+  document.getElementById('next-btn').style.display = 'none';
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.answer-btn');
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedback');
+  if (idx === q.ans) {
+    score += 100; correct++;
+    btns[idx].classList.add('correct');
+    fb.className = 'feedback correct';
+    fb.innerHTML = `<strong>✓ ¡Correcto! +100 pts</strong> — ${q.exp}`;
+  } else {
+    btns[idx].classList.add('wrong');
+    btns[q.ans].classList.add('reveal-correct');
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `<strong>✗ Incorrecto.</strong> Correcta: <strong>${q.opts[q.ans]}</strong>. ${q.exp}`;
+  }
+  fb.style.display = 'block';
+  document.getElementById('score-display').textContent = score;
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'block';
+  nb.textContent = current < questions.length - 1 ? 'Siguiente →' : 'Ver resultados →';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) showEnd();
+  else renderQuestion();
+}
+
+function showEnd() {
+  show('end-screen');
+  const pct = Math.round((correct / questions.length) * 100);
+  let trophy = '🏆', msg = '"¡Excelente! Dominas la Geografía Económica de Panamá."';
+  if (pct < 50) { trophy = '📖'; msg = '"Sigue repasando las diapositivas — ¡tú puedes mejorar!"'; }
+  else if (pct < 80) { trophy = '⭐'; msg = '"¡Buen trabajo! Repasa los temas donde fallaste."'; }
+  document.getElementById('trophy').textContent = trophy;
+  document.getElementById('end-score').textContent = `${score} pts`;
+  document.getElementById('end-sub').textContent = `${correct} de ${questions.length} correctas`;
+  document.getElementById('s-correct').textContent = correct;
+  document.getElementById('s-wrong').textContent = questions.length - correct;
+  document.getElementById('s-pct').textContent = pct + '%';
+  document.getElementById('end-msg').textContent = msg;
+}
+
+function restartGame() { startGame(); }
+</script>
+</body>
+</html>
